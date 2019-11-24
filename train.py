@@ -10,7 +10,8 @@ class Trainer(object):
     def __init__(self, model):
         self.model = model.half()
 
-    def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16):
+    def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16, device=torch.device('cuda')):
+        self.model.to(device)
         self.model.train()
         train_sampler = RandomSampler(train_dataset)
         train_dataloader = DataLoader(
@@ -39,7 +40,9 @@ class Trainer(object):
                 index = i
         return index
 
-    def evalu(self, test_dataset):
+    def evalu(self, test_dataset, device='cuda'):
+        device = torch.device(device)
+        self.model.to(device)
         self.model.eval()
         test_dataset = test_dataset.tensors
         Total = len(test_dataset)

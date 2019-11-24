@@ -4,7 +4,7 @@ from DataLoader import load_datas
 from transformers import *
 
 if __name__ == '__main__':
-    net = MyBert(128, 19, dropoutRate=0.1).cuda()
+    net = MyBert(128, 19, dropoutRate=0.1)
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     tokenizer.add_special_tokens(
         {'additional_special_tokens': ['<e1>', '<e2>', '</e1>', '</e2>']})
@@ -13,4 +13,5 @@ if __name__ == '__main__':
 
     train = Trainer(net)
     train.train(train_dataset, tokenizer, dropoutRate=0.1,num_train_epochs=5)
-    train.evalu(test_dataset)
+    
+    train.evalu(test_dataset,device='cpu')
