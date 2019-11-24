@@ -10,7 +10,7 @@ class Trainer(object):
     def __init__(self, model):
         self.model = model
 
-    def train(self, train_dataset, tokenizer, num_train_epochs, lr=2e-5, batch_size=16):
+    def train(self, train_dataset, tokenizer, num_train_epochs=5, lr=2e-5, batch_size=16):
         self.model.train()
         train_sampler = RandomSampler(train_dataset)
         train_dataloader = DataLoader(
@@ -63,4 +63,4 @@ class Trainer(object):
             if self.get_class(predict[i])==labels[i]:
                 Right+=1
 
-        print('Accuracy = %f %%, total = %d ' % (right/tot*100, tot))
+        print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))

@@ -1,1 +1,5 @@
 aa.py
+__pycache__/train.cpython-37.pyc
+__pycache__/model.cpython-37.pyc
+__pycache__/DataLoader.cpython-37.pyc
+.gitignore
