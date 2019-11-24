@@ -1,10 +1,7 @@
-import pandas as pd
 import csv
 from tqdm import tqdm
 import numpy as np
 import os
-
-s = pd.Series([1, 3, 6, np.nan, 44, 1])
 
 
 class DataLoader(object):
