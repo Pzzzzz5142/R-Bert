@@ -8,11 +8,9 @@ from transformers import *
 
 class Trainer(object):
     def __init__(self, model):
-        self.model = model
+        self.model = model.cuda().half()
 
-    def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16, device=torch.device('cuda')):
-        self.model.to(device)
-        self.model.half()
+    def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16):
         self.model.train()
         train_sampler = RandomSampler(train_dataset)
         train_dataloader = DataLoader(
@@ -41,11 +39,7 @@ class Trainer(object):
                 index = i
         return index
 
-    def evalu(self, test_dataset, device='cuda'):
-        if device=='cpu':
-            self.model.float()
-        device = torch.device(device)
-        self.model.to(device)
+    def evalu(self, test_dataset):
         self.model.eval()
         test_dataset = test_dataset.tensors
         Total = len(test_dataset)
