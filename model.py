@@ -8,31 +8,37 @@ class MyBert(nn.Module):
         super(MyBert, self).__init__()
 
         self.bert = BertModel.from_pretrained('bert-base-uncased')
-        self.hidden1 = nn.Linear(784, 784)
-        self.hidden2 = nn.Linear(784, 784)
-        self.hidden3 = nn.Linear(3*784, classNum)
+        self.hidden1 = nn.Linear(768, 768)
+        self.hidden2 = nn.Linear(768, 768)
+        self.hidden3 = nn.Linear(3*768, classNum)
         self.dropout = nn.Dropout(dropoutRate)
         self.maxLen = maxLen
 
     def getaverage(self, hs):
 
-        return res
+        return
 
     def forward(self, datas, attention_mask, e1_mask, e2_mask):
-        x, cls_vec = self.bert(datas.input_ids, attention_mask=attention_mask)
-        entity1 = torch.tensor([]).cuda()
-        entity1 = torch.tensor([]).cuda()
-        for i in range(datas):
+        x, cls_vec = self.bert(datas, attention_mask=attention_mask)
+        entity1 = None
+        entity2 = None
+        flg = True
+        for i in range(len(datas)):
             tmp1 = x[i][e1_mask[i][0]+1]
             tmp2 = x[i][e2_mask[i][0]+1]
             for j in range(e1_mask[i][0]+2, e1_mask[i][1]):
-                tmp1 += x[i][j]
+                tmp1 = tmp1 + x[i][j]
             for j in range(e2_mask[i][0]+2, e2_mask[i][1]):
-                tmp2 += x[i][j]
-            entity1 = torch.cat(
-                (entity1, tmp1/(e1_mask[i][1]-e1_mask[i][0]-1)), 0)
-            entity2 = torch.cat(
-                (entity2, tmp2/(e2_mask[i][1]-e2_mask[i][0]-1)), 0)
+                tmp2 = tmp2 + x[i][j]
+            if flg:
+                entity1 = tmp1.unsqueeze(0)
+                entity2 = tmp2.unsqueeze(0)
+                flg = False
+            else:
+                entity1 = torch.cat(
+                    (entity1, (tmp1/(e1_mask[i][1]-e1_mask[i][0]-1)).unsqueeze(0)), dim=0)
+                entity2 = torch.cat(
+                    (entity2, (tmp2/(e2_mask[i][1]-e2_mask[i][0]-1)).unsqueeze(0)), dim=0)
         '''   
         entity1 = torch.tensor([[data[i] for i in range(
             data.e1_mask[0]+1, data.e2_mask[1])] for data in x]).cuda()#[b,j-i+1,len]
@@ -51,5 +57,5 @@ class MyBert(nn.Module):
         hidden_vec = torch.cat((cls_vec, entity1, entity2), dim=-1)
         hidden_vec = self.dropout(hidden_vec)
         x = self.hidden3(hidden_vec)
-        x = torch.softmax(x)
+        x = torch.softmax(x, dim=1)
         return x
