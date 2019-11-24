@@ -2,6 +2,7 @@ import csv
 from tqdm import tqdm
 import numpy as np
 import os
+from torch.utils.data import TensorDataset
 
 
 class InputFeatures(object):
@@ -53,7 +54,24 @@ def load_datas(path, tokenizer, max_len, pad_token=0, add_special_token=True, mo
             features.append(InputFeatures(input_ids, attention_mask, label_id=labels.index(label),
                                           e1_mask=(e1_b, e1_e), e2_mask=(e2_b, e2_e)))
 
-    return features
+    all_input_ids = torch.tensor(
+        [f.input_ids for f in features], dtype=torch.long)
+    all_attention_mask = torch.tensor(
+        [f.attention_mask for f in features], dtype=torch.long)
+    all_token_type_ids = torch.tensor(
+        [f.token_type_ids for f in features], dtype=torch.long)
+    all_e1_mask = torch.tensor(
+        [f.e1_mask for f in features], dtype=torch.long)  # add e1 mask
+    all_e2_mask = torch.tensor(
+        [f.e2_mask for f in features], dtype=torch.long)  # add e2 mask
+
+    all_label_ids = torch.tensor(
+        [f.label_id for f in features], dtype=torch.long)
+
+    dataset = TensorDataset(all_input_ids, all_attention_mask,
+                            all_token_type_ids, all_label_ids, all_e1_mask, all_e2_mask)
+
+    return dataset
 
 
 if __name__ == '__main__':
