@@ -45,14 +45,10 @@ class Trainer(object):
         Total = len(test_dataset)
         Right = 0
 
-        input_ids = torch.tensor([x.input_ids for x in test_dataset]).cuda()
-        attention_mask = torch.tensor(
-            [x.attention_mask for x in test_dataset]).cuda()
-        e1_mask = torch.tensor([i.e1_mask for i in test_dataset]).cuda()
-        e2_mask = torch.tensor([i.e2_mask for i in test_dataset]).cuda()
-        labels = [x.label_id for x in test_dataset]
+        labels=test_dataset[2].tolist()        
+
         predict = self.model(
-            input_ids, attention_mask=attention_mask, e1_mask=e1_mask, e2_mask=e2_mask)
+            test_dataset[0], attention_mask=test_dataset[1], e1_mask=test_dataset[3], e2_mask=test_dataset[4])
         for i in range(len(predict)):
             if self.get_class(predict[i]) == labels[i]:
                 Right += 1
