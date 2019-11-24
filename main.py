@@ -12,5 +12,5 @@ if __name__ == '__main__':
     test_dataset = load_datas('./BERT/data', tokenizer, 128, mode=False)
 
     train = Trainer(net)
-    train.train(train_dataset, tokenizer, dropoutRate=0.1)
+    train.train(train_dataset, tokenizer, dropoutRate=0.1,num_train_epochs=5)
     train.evalu(test_dataset)

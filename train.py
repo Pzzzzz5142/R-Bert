@@ -41,11 +41,11 @@ class Trainer(object):
 
     def evalu(self, test_dataset):
         self.model.eval()
-
+        test_dataset = test_dataset.tensors
         Total = len(test_dataset)
         Right = 0
 
-        labels=test_dataset[2].tolist()        
+        labels = test_dataset[2].tolist()
 
         predict = self.model(
             test_dataset[0], attention_mask=test_dataset[1], e1_mask=test_dataset[3], e2_mask=test_dataset[4])
