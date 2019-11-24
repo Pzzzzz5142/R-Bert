@@ -10,7 +10,7 @@ class Trainer(object):
     def __init__(self, model):
         self.model = model
 
-    def train(self, train_dataset, tokenizer, num_train_epochs=5, lr=2e-5, batch_size=16):
+    def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16):
         self.model.train()
         train_sampler = RandomSampler(train_dataset)
         train_dataloader = DataLoader(
@@ -21,16 +21,10 @@ class Trainer(object):
         for _ in train_iterator:
             epoch_iterator = tqdm(train_dataloader, desc="Iteration")
             for step, batch in enumerate(epoch_iterator):
-                inputs = torch.tensor([i.input_ids for i in batch]).cuda()
-                e1_mask = torch.tensor([i.e1_mask for i in batch]).cuda()
-                e2_mask = torch.tensor([i.e2_mask for i in batch]).cuda()
-                labels = torch.tensor([i.label_id for i in batch]).cuda()
-                attention_mask = torch.tensor(
-                    [i.attention_mask for i in batch]).cuda()
-                outputs = self.model(inputs, attention_mask=attention_mask,
-                                     e1_mask=e1_mask, e2_mask=e2_mask)
+                outputs = self.model(batch[0], attention_mask=batch[1],
+                                     e1_mask=batch[3], e2_mask=batch[4])
 
-                loss = loss_F(outputs, labels)
+                loss = loss_F(outputs, batch[2])
 
                 optimizer.zero_grad()
                 loss.backward()
@@ -60,7 +54,7 @@ class Trainer(object):
         predict = self.model(
             input_ids, attention_mask=attention_mask, e1_mask=e1_mask, e2_mask=e2_mask)
         for i in range(len(predict)):
-            if self.get_class(predict[i])==labels[i]:
-                Right+=1
+            if self.get_class(predict[i]) == labels[i]:
+                Right += 1
 
         print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))
