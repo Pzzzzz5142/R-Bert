@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import DataLoader, Dataset, RandomSampler
+from torch.utils.data import DataLoader, Dataset, RandomSampler,SequentialSampler
 from tqdm import tqdm, trange
 import torch.nn as nn
 
@@ -30,6 +30,8 @@ class Trainer(object):
                 loss.backward()
                 optimizer.step()
 
+        self.save_model()
+
     def get_class(self, x):
         ls = x.tolist()
         index, val = 0, ls[0]
@@ -41,16 +43,22 @@ class Trainer(object):
 
     def evalu(self, test_dataset):
         self.model.eval()
-        test_dataset = test_dataset.tensors
+        eval_sampler=SequentialSampler(test_dataset)
+        eval_dataloader=DataLoader(test_dataset,sampler=eval_sampler,batch_size=16)
         Total = len(test_dataset)
         Right = 0
 
         labels = test_dataset[2].tolist()
 
-        predict = self.model(
-            test_dataset[0], attention_mask=test_dataset[1], e1_mask=test_dataset[3], e2_mask=test_dataset[4])
-        for i in range(len(predict)):
-            if self.get_class(predict[i]) == labels[i]:
-                Right += 1
+        for batch in tqdm(eval_dataloader,desc='Eva'):
+            with torch.no_grad():
+                outputs=self.model(batch[0],attention_mask=batch[1],e1_mask=batch[3],e2_mask=batch[4])
+
+                for i in range(len(outputs)):
+                    if self.get_class(outputs[i])==batch[2].tolist()[i]:
+                        Right+=1
 
         print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))
+
+    def save_model(self):
+        self.model.save_pretrained('./BERT/model')
