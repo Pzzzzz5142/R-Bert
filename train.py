@@ -42,7 +42,7 @@ class Trainer(object):
                 index = i
         return index
 
-    def evalu(self, test_dataset):
+    def evalu(self, path, test_dataset):
         self.model.eval()
         eval_sampler = SequentialSampler(test_dataset)
         eval_dataloader = DataLoader(
@@ -62,8 +62,9 @@ class Trainer(object):
                     clstype = self.get_class(outputs[i])
                     if clstype == batch[2].tolist()[i]:
                         Right += 1
-                    file_for_check.write('%d\t%s\n' % (i+1, labels[clstype]))
                     Total += 1
+                    file_for_check.write('%d\t%s\n' %
+                                         (Total+8000, labels[clstype]))
 
         print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))
 

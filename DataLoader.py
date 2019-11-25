@@ -34,7 +34,7 @@ def load_datas(path, tokenizer, max_len, pad_token=0, add_special_token=True, mo
         for line in open_file.readlines():
             line = line.split('\t')
             label = line[0]
-            text = line[1]
+            text = line[1].strip('\n')
             tokened = tokenizer.tokenize(
                 ('[CLS] ' if add_special_token else '') + text)
             e1_b = tokened.index('<e1>')
@@ -62,7 +62,7 @@ def load_datas(path, tokenizer, max_len, pad_token=0, add_special_token=True, mo
     all_e1_mask = torch.tensor(
         [f.e1_mask for f in features], dtype=torch.long).cuda()  # add e1 mask
     all_e2_mask = torch.tensor(
-        [f.e2_mask for f in features], dtype=torch.long).cuda() # add e2 mask
+        [f.e2_mask for f in features], dtype=torch.long).cuda()  # add e2 mask
 
     all_label_ids = torch.tensor(
         [f.label_id for f in features], dtype=torch.long).cuda()
