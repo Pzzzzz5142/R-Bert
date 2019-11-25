@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import DataLoader, Dataset, RandomSampler,SequentialSampler
+from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
 from tqdm import tqdm, trange
 import torch.nn as nn
 
@@ -30,7 +30,7 @@ class Trainer(object):
                 loss.backward()
                 optimizer.step()
 
-        self.save_model()
+        # self.save_model()
 
     def get_class(self, x):
         ls = x.tolist()
@@ -43,20 +43,21 @@ class Trainer(object):
 
     def evalu(self, test_dataset):
         self.model.eval()
-        eval_sampler=SequentialSampler(test_dataset)
-        eval_dataloader=DataLoader(test_dataset,sampler=eval_sampler,batch_size=16)
-        Total = len(test_dataset)
+        eval_sampler = SequentialSampler(test_dataset)
+        eval_dataloader = DataLoader(
+            test_dataset, sampler=eval_sampler, batch_size=16)
+        Total = 0
         Right = 0
 
-        labels = test_dataset[2].tolist()
-
-        for batch in tqdm(eval_dataloader,desc='Eva'):
+        for batch in tqdm(eval_dataloader, desc='Eva'):
             with torch.no_grad():
-                outputs=self.model(batch[0],attention_mask=batch[1],e1_mask=batch[3],e2_mask=batch[4])
+                outputs = self.model(
+                    batch[0], attention_mask=batch[1], e1_mask=batch[3], e2_mask=batch[4])
 
                 for i in range(len(outputs)):
-                    if self.get_class(outputs[i])==batch[2].tolist()[i]:
-                        Right+=1
+                    if self.get_class(outputs[i]) == batch[2].tolist()[i]:
+                        Right += 1
+                    Total += 1
 
         print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))
 
