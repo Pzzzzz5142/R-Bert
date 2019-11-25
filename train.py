@@ -50,14 +50,19 @@ class Trainer(object):
         Total = 0
         Right = 0
 
+        labels = open(path+'/label.txt').read().split('\n')
+        file_for_check = open(path+'/my_ans.txt', 'w')
+
         for batch in tqdm(eval_dataloader, desc='Eva'):
             with torch.no_grad():
                 outputs = self.model(
                     batch[0], attention_mask=batch[1], e1_mask=batch[3], e2_mask=batch[4])
 
                 for i in range(len(outputs)):
-                    if self.get_class(outputs[i]) == batch[2].tolist()[i]:
+                    clstype = self.get_class(outputs[i])
+                    if clstype == batch[2].tolist()[i]:
                         Right += 1
+                    file_for_check.write('%d\t%s\n' % (i+1, labels[clstype]))
                     Total += 1
 
         print('Accuracy = %f %%, total = %d ' % (Right/Total*100, Total))
