@@ -9,6 +9,7 @@ class MyBert(nn.Module):
 
         self.bert = BertModel.from_pretrained('bert-base-uncased')
         self.hidden1 = nn.Linear(768, 768)
+        self.hidden1.ini
         self.hidden2 = nn.Linear(768, 768)
         self.hidden3 = nn.Linear(3*768, classNum)
         self.dropout = nn.Dropout(dropoutRate)

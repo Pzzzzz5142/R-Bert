@@ -8,7 +8,7 @@ from transformers import *
 
 class Trainer(object):
     def __init__(self, model):
-        self.model = model.cuda().half()
+        self.model = model.cuda()
 
     def train(self, train_dataset, tokenizer, dropoutRate, num_train_epochs=5, lr=2e-5, batch_size=16):
         self.model.train()
