@@ -25,6 +25,7 @@ class Trainer(object):
                                      e1_mask=batch[3], e2_mask=batch[4])
 
                 loss = loss_F(outputs, batch[2])
+                #print('loss = ',loss)
 
                 optimizer.zero_grad()
                 loss.backward()

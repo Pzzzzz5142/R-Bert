@@ -57,5 +57,5 @@ class MyBert(nn.Module):
         hidden_vec = torch.cat((cls_vec, entity1, entity2), dim=-1)
         hidden_vec = self.dropout(hidden_vec)
         x = self.hidden3(hidden_vec)
-        x = torch.softmax(x, dim=1)
+        #x = torch.softmax(x, dim=1)
         return x
