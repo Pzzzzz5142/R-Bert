@@ -50,8 +50,8 @@ class Trainer(object):
         Total = 0
         Right = 0
 
-        labels = open(path+'/label.txt').read().split('\n')
-        file_for_check = open(path+'/my_ans.txt', 'w')
+        labels = open(path+'/data/label.txt').read().split('\n')
+        file_for_check = open(path+'/data/my_ans.txt', 'w')
 
         for batch in tqdm(eval_dataloader, desc='Eva'):
             with torch.no_grad():

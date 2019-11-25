@@ -29,8 +29,8 @@ class InputFeatures(object):
 
 def load_datas(path, tokenizer, max_len, pad_token=0, add_special_token=True, mode=True):
     features = []
-    labels = open(path+'/label.txt').read().split('\n')
-    with open(path+('/train.tsv' if mode else '/test.tsv')) as open_file:
+    labels = open(path+'/data/label.txt').read().split('\n')
+    with open(path+('/data/train.tsv' if mode else '/data/test.tsv')) as open_file:
         for line in open_file.readlines():
             line = line.split('\t')
             label = line[0]

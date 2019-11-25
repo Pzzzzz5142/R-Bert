@@ -9,11 +9,11 @@ class MyBert(nn.Module):
 
         self.bert = BertModel.from_pretrained('bert-base-uncased')
         self.hidden1 = nn.Linear(768, 768)
-        nn.init.xavier_normal(self.hidden1.weight)
+        nn.init.xavier_normal_(self.hidden1.weight)
         self.hidden2 = nn.Linear(768, 768)
-        nn.init.xavier_normal(self.hidden2.weight)
+        nn.init.xavier_normal_(self.hidden2.weight)
         self.hidden3 = nn.Linear(3*768, classNum)
-        nn.init.xavier_normal(self.hidden3.weight)
+        nn.init.xavier_normal_(self.hidden3.weight)
         self.dropout = nn.Dropout(dropoutRate)
         self.dropout1 = nn.Dropout(dropoutRate)
         self.dropout2 = nn.Dropout(dropoutRate)
@@ -26,7 +26,8 @@ class MyBert(nn.Module):
         return
 
     def forward(self, datas, attention_mask, e1_mask, e2_mask):
-        x, cls_vec = self.bert(datas, attention_mask=attention_mask)
+        x = self.bert(datas, attention_mask=attention_mask)[0]
+        cls_vec = None
         entity1 = None
         entity2 = None
         flg = True
@@ -40,18 +41,23 @@ class MyBert(nn.Module):
             if flg:
                 entity1 = tmp1.unsqueeze(0)
                 entity2 = tmp2.unsqueeze(0)
+                cls_vec = x[i][0].unsqueeze(0)
                 flg = False
             else:
                 entity1 = torch.cat(
                     (entity1, (tmp1/float(e1_mask[i][1]-e1_mask[i][0]-1)).unsqueeze(0)), dim=0)
                 entity2 = torch.cat(
                     (entity2, (tmp2/float(e2_mask[i][1]-e2_mask[i][0]-1)).unsqueeze(0)), dim=0)
+                cls_vec = torch.cat((cls_vec, x[i][0].unsqueeze(0)), dim=0)
         '''   
         entity1 = torch.tensor([[data[i] for i in range(
             data.e1_mask[0]+1, data.e2_mask[1])] for data in x]).cuda()#[b,j-i+1,len]
         entity2 = torch.tensor([[data[i] for i in range(
             data.e1_mask[0]+1, data.e2_mask[1])] for data in x]).cuda()
         '''
+        cls_vec = torch.tanh(cls_vec)
+        cls_vec = self.dropout2(cls_vec)
+        cls_vec = self.hidden2(cls_vec)
         entity1 = torch.tanh(entity1)
         entity2 = torch.tanh(entity2)
         entity1 = self.dropout(entity1)
