@@ -41,10 +41,10 @@ def load_datas(path, tokenizer, max_len, pad_token=0, add_special_token=True, mo
             e1_e = tokened.index('</e1>')
             e2_b = tokened.index('<e2>')
             e2_e = tokened.index('</e2>')
-            tokened[e1_b] = '¥'
-            tokened[e1_e] = '¥'
-            tokened[e2_b] = '§'
-            tokened[e2_e] = '§'
+            tokened[e1_b] = '$'
+            tokened[e1_e] = '$'
+            tokened[e2_b] = '#'
+            tokened[e2_e] = '#'
             input_ids = tokenizer.convert_tokens_to_ids(tokened)
             attention_mask = [1 if pad_token == 0 else 1]*len(input_ids)
             padding_length = max_len-len(input_ids)

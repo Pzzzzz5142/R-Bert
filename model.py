@@ -9,15 +9,13 @@ class MyBert(nn.Module):
 
         self.bert = BertModel.from_pretrained('bert-base-uncased')
         self.hidden1 = nn.Linear(768, 768)
-        #nn.init.xavier_uniform_(self.hidden1.weight)
+        nn.init.xavier_uniform_(self.hidden1.weight)
         self.hidden2 = nn.Linear(768, 768)
-        #nn.init.xavier_uniform_(self.hidden2.weight)        
+        nn.init.xavier_uniform_(self.hidden2.weight)
         self.hidden3 = nn.Linear(3*768, classNum)
-        #nn.init.xavier_uniform_(self.hidden3.weight)
-        self.dropout = nn.Dropout2d(dropoutRate)
-        self.dropout1 = nn.Dropout2d(dropoutRate)
-        self.dropout2 = nn.Dropout2d(dropoutRate)
-        self.dropout3 = nn.Dropout2d(dropoutRate)
+        nn.init.xavier_uniform_(self.hidden3.weight)
+        self.tanh=nn.Tanh()
+        self.dropout = nn.Dropout(dropoutRate)
         self.maxLen = maxLen
 
     def forward(self, datas, attention_mask, e1_mask, e2_mask):
@@ -56,15 +54,16 @@ class MyBert(nn.Module):
             data.e1_mask[0]+1, data.e2_mask[1])] for data in x]).cuda()
         '''
         cls_vec = self.dropout(cls_vec)
-        cls_vec = torch.tanh(cls_vec)
+        cls_vec = self.tanh(cls_vec)
+        cls_vec = y
         cls_vec = self.hidden1(cls_vec)
-        entity1 = self.dropout1(entity1)
-        entity2 = self.dropout2(entity2)
-        entity1 = torch.tanh(entity1)
-        entity2 = torch.tanh(entity2)
+        entity1 = self.dropout(entity1)
+        entity2 = self.dropout(entity2)
+        entity1 = self.tanh(entity1)
+        entity2 = self.tanh(entity2)
         entity1 = self.hidden2(entity1)
         entity2 = self.hidden2(entity2)
-        hidden_vec = torch.cat((cls_vec, entity1, entity2), dim=-1)
-        hidden_vec = self.dropout3(hidden_vec)
+        hidden_vec = self.cat((cls_vec, entity1, entity2), dim=-1)
+        hidden_vec = self.dropout(hidden_vec)
         x = self.hidden3(hidden_vec)
         return x
